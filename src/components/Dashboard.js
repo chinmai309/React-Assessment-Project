@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, startTransition } from 'react';
 import { DashboardOutlined,TeamOutlined, RightCircleFilled, FormOutlined, CommentOutlined, UserOutlined, ProductOutlined, CameraOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Layout, Menu, Card, Col, Row, Button, Typography } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { postsState, userState, albumsState, photosState } from './state';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { postsState, userState, albumsState, photosState, collapsedState, displayPostsState, latestPostsSelector, filteredAlbumsSelector, filteredPhotosSelector, userSelector } from './state';
 import { createStyles } from 'antd-style';
 
 const { Header, Content, Sider } = Layout;
@@ -34,98 +34,88 @@ const useStyle = createStyles(({ prefixCls, css }) => ({
 
 const Dashboard = () => {
   const [posts, setPosts] = useRecoilState(postsState);
-  const [albums, setAlbums] = useRecoilState(albumsState);
-  const [photos, setPhotos] = useRecoilState(photosState);
-  const [user, setUser] = useRecoilState(userState);
-  const [collapsed, setCollapsed] = useState(false);
+  const albums = useRecoilValue(filteredAlbumsSelector);
+  const photos = useRecoilValue(filteredPhotosSelector);
+  const user = useRecoilValue(userSelector);
+  const [collapsed, setCollapsed] = useRecoilState(collapsedState);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { styles } = useStyle();
-  const [displayPosts, setDisplayPosts] = useState([]);
+  
 
   useEffect(() => {
-    // Fetch posts from local storage
-    const storedPosts = localStorage.getItem('posts');
-    if (storedPosts) {
+    const fetchAndCombinePosts = async () => {
       try {
-        const postsArray = JSON.parse(storedPosts);
-        // Sort posts: Newer posts first, then post ID 1 last
-        const sortedPosts = postsArray.sort((a, b) => {
+        // Fetch posts from local storage
+        const storedPosts = localStorage.getItem('posts');
+        let localPosts = [];
+        if (storedPosts) {
+          try {
+            localPosts = JSON.parse(storedPosts);
+          } catch (error) {
+            console.error('Error parsing posts from local storage:', error);
+          }
+        }
+
+        // Fetch posts from API
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=4');
+        const apiPosts = await response.json();
+
+        // Combine posts (API posts first, to prioritize API data over local storage)
+        const combinedPosts = [...localPosts, ...apiPosts];
+
+        // Remove duplicates by filtering based on unique `id`
+        const uniquePosts = combinedPosts.filter((post, index, self) =>
+          index === self.findIndex(p => p.id === post.id)
+        );
+
+        // Sort the posts: place post with ID 1 last, and keep the rest in the same order
+        const sortedPosts = uniquePosts.sort((a, b) => {
           if (a.id === 1) return 1;
-          if (b.id === 1) return -1;
+          if (b.id === 1) return 1;
           return 0;
-        }).slice(0, 4); // Limit to the first 4 posts
-        setDisplayPosts(sortedPosts);
+        });
+
+        // Display only the first 4 posts
+        setPosts(sortedPosts.slice(0, 4));
+
       } catch (error) {
-        console.error('Error parsing posts from local storage:', error);
+        console.error('Error fetching or combining posts:', error);
       }
-    }
+      finally {
+        setLoading(false); // Set loading to false after data is processed
+      }
+    };
+
+    fetchAndCombinePosts();
   }, []);
 
-  useEffect(() => {
-    const fetchAlbums = async () => {
-      try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/albums?_limit=4'); // Fetching 4 albums
-        const data = await response.json();
-        setAlbums(data);
-      } catch (error) {
-        console.error('Error fetching albums:', error);
-      }
-    };
-    fetchAlbums();
-  }, [setAlbums]);
-
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/photos?_limit=4'); // Fetching 4 photos
-        const data = await response.json();
-        setPhotos(data);
-      } catch (error) {
-        console.error('Error fetching photos:', error);
-      }
-    };
-    fetchPhotos();
-  }, [setPhotos]);
-
-  useEffect(() => {
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    if (loggedInUser) {
-      try {
-        const parsedUser = JSON.parse(loggedInUser);
-        if (parsedUser && typeof parsedUser.name === 'string') {
-          setUser(parsedUser);
-        } else {
-          navigate('/login', { replace: true });
-        }
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        navigate('/login', { replace: true });
-      }
-    } else {
-      navigate('/login', { replace: true });
-    }
-  }, [navigate, setUser]);
+  if (loading) {
+    return <div>Loading...</div>; // Show a loader or placeholder while loading
+  }
+  
 
   const handleLogout = () => {
     localStorage.removeItem('loggedInUser');
-    setUser(null); // Clear user state
     navigate('/login', { replace: true });
   };
 
   const handleClickPosts = () => {
-    navigate("/posts");
+    startTransition(() => {
+      navigate("/posts");
+    });
   };
 
   const handleClickAlbums = () => {
-    navigate("/albums");
+    startTransition(() => {
+      navigate("/albums");
+    });
   };
 
   const handleClickPhotos = () => {
-    navigate("/photos");
-  };
-
-  const toggleCollapse = () => {
-    setCollapsed(!collapsed);
+    startTransition(() => {
+      navigate("/photos");
+    });
   };
 
   const truncateText = (text, lines = 3) => {
@@ -134,6 +124,7 @@ const Dashboard = () => {
     return truncated;
   };
 
+  
   return (
     <Layout style={{ minHeight: '100vh'}}>
       <Sider
@@ -209,7 +200,7 @@ const Dashboard = () => {
           <h1 style={{ color: '#0d374f' }}><FormOutlined /> Posts</h1>
           <div style={{ minHeight: 260, borderRadius: '8px' }}>
             <Row gutter={16}>
-              {displayPosts.map((post) => (
+              {posts.map((post) => (
                 <Col span={6} key={post.id}>
                   <Card
                     title={post.title}
@@ -310,6 +301,7 @@ const Dashboard = () => {
         </Content>
       </Layout>
     </Layout>
+
   );
 };
 

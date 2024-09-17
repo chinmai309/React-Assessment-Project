@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Card, Descriptions, List, Typography } from 'antd';
 import { useParams } from 'react-router-dom';
 import { FormOutlined, UserOutlined, CommentOutlined } from '@ant-design/icons';
+import { commentsState, photoState, postState, userState } from './state';
+import { useRecoilState } from 'recoil';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const PostsDetail = () => {
   const { id } = useParams();
-  const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [user, setUser] = useState(null);
-  const [photo, setPhoto] = useState(null);
+  const [post, setPost] = useRecoilState(postState);
+  const [comments, setComments] = useRecoilState(commentsState);
+  const [user, setUser] = useRecoilState(userState);
+  const [photo, setPhoto] = useRecoilState(photoState);
 
   useEffect(() => {
     const fetchPostDetails = async () => {

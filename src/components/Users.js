@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Card, Pagination, Row, Col, Typography, theme, ConfigProvider } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { usersState } from './state'; // Import from state file
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { collapsedState, currentPageState, totalPostsState, totalUsersSelector, usersSelector, usersState } from './state'; // Import from state file
 import { DashboardOutlined, TeamOutlined, FormOutlined, CommentOutlined, ProductOutlined, CameraOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
 const { Header, Content, Sider } = Layout;
@@ -10,10 +10,10 @@ const { Meta } = Card;
 const { Title } = Typography;
 
 const Users = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPosts, setTotalPosts] = useState(0);
-  const [users, setUsers] = useRecoilState(usersState);
-  const [collapsed, setCollapsed] = useState(false);
+  const users = useRecoilValue(usersSelector);
+  const totalUsers = useRecoilValue(totalUsersSelector);
+  const [currentPage, setCurrentPage] = useRecoilState(currentPageState);
+  const [collapsed, setCollapsed] = useRecoilState(collapsedState);
 
   const usersPerPage = 12; // Display 12 users per page
   const usersPerRow = 4; // Number of users per row
@@ -24,16 +24,6 @@ const Users = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Fetch users using Fetch API
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then(response => response.json())
-      .then(data => {
-        setUsers(data);
-        setTotalPosts(data.length); // Set total number of users
-      })
-      .catch(error => console.error('Error fetching users:', error));
-  }, [setUsers]);
 
   const onPageChange = (page) => {
     setCurrentPage(page);
@@ -155,7 +145,7 @@ const Users = () => {
             align='end'
             current={currentPage}
             pageSize={usersPerPage}
-            total={totalPosts}
+            total={totalUsers}
             onChange={onPageChange}
             style={{ marginTop: 20, textAlign: 'center' }}
           />

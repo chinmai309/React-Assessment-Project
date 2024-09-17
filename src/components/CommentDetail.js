@@ -2,31 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { Card, Col, Row, Layout } from 'antd';
-import { commentsState } from './state'; // Import from state file
+import { commentsSelector, commentsState, filteredCommentsSelector, filteredCommentsState } from './state'; // Import from state file
 import { CommentOutlined } from '@ant-design/icons';
 
 const { Header, Content } = Layout;
 
 const CommentDetail = () => {
   const { postId } = useParams();
-  const [comments, setComments] = useRecoilState(commentsState);
-  const [filteredComments, setFilteredComments] = useState([]);
-
-  useEffect(() => {
-    // Fetch comments if not already available
-    if (comments.length === 0) {
-      fetch('https://jsonplaceholder.typicode.com/comments')
-        .then(response => response.json())
-        .then(data => {
-          setComments(data);
-          setFilteredComments(data.filter(comment => comment.postId === parseInt(postId, 10)));
-        })
-        .catch(error => console.error('Error fetching comments:', error));
-    } else {
-      // Filter comments based on the postId
-      setFilteredComments(comments.filter(comment => comment.postId === parseInt(postId, 10)));
-    }
-  }, [postId, comments, setComments]);
+  const comments = useRecoilValue(commentsSelector);
+  const filteredComments = useRecoilValue(filteredCommentsSelector(postId));
 
   return (
     <Layout>

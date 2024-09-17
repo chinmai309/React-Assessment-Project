@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Layout,Menu, Card, Pagination, Row, Col, Typography, theme } from 'antd';
 import { DashboardOutlined, RightCircleFilled, FormOutlined, CommentOutlined, TeamOutlined, ProductOutlined, CameraOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { albumsState, collapsedState, currentPageState, photosState, photosWithAlbumsSelector, totalPhotosSelector, totalPhotosState } from './state';
 
 const { Header, Content, Sider } = Layout;
 const { Meta } = Card;
 const { Title } = Typography;
 
 const Photos = () => {
-  const [photos, setPhotos] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPhotos, setTotalPhotos] = useState(0);
-  const [albums, setAlbums] = useState([]);
-  const [collapsed, setCollapsed] = useState(false);
+  const photos = useRecoilValue(photosWithAlbumsSelector);
+  const totalPhotos = useRecoilValue(totalPhotosSelector);
+  const [currentPage, setCurrentPage] = useRecoilState(currentPageState);
+  const [collapsed, setCollapsed] = useRecoilState(collapsedState);
 
   const photosPerPage = 12; // Display 12 photos per page
   const photosPerRow = 4; // Number of photos per row
@@ -20,44 +21,6 @@ const Photos = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-
-  useEffect(() => {
-    const fetchPhotosAndAlbums = async () => {
-      try {
-        // Fetch photos
-        const photosResponse = await fetch(`https://jsonplaceholder.typicode.com/photos?_page=${currentPage}&_limit=${photosPerPage}`);
-        const photosData = await photosResponse.json();
-        
-        // Fetch albums
-        const albumsResponse = await fetch('https://jsonplaceholder.typicode.com/albums');
-        const albumsData = await albumsResponse.json();
-
-        // Fetch total number of photos
-        const totalResponse = await fetch('https://jsonplaceholder.typicode.com/photos');
-        const totalData = await totalResponse.json();
-        
-        // Create a map of albums for quick lookup
-        const albumsMap = albumsData.reduce((acc, album) => {
-          acc[album.id] = album;
-          return acc;
-        }, {});
-
-        // Enhance photos with user data
-        const photosWithAlbums = photosData.map(photo => ({
-          ...photo,
-          album: albumsMap[photo.albumId] || {}, // Attach album data based on albumId
-        }));
-
-        setPhotos(photosWithAlbums);
-        setAlbums(albumsData); // Store albums for potential use
-        setTotalPhotos(totalData.length);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchPhotosAndAlbums();
-  }, [currentPage]);
 
   const onPageChange = (page) => {
     setCurrentPage(page);
@@ -160,8 +123,14 @@ const Photos = () => {
                         height: 'auto' // Adjust height to fit 4 lines approximately
                       }}>
                         <div style={{fontSize: 18, fontWeight: 'bold'}}>{photo.title} </div> <br />
+                        {photo.album ? (
+                          <>
                         Album Id: {photo.album.id || 'N/A'} <br />
                         Title: {photo.album.title || 'N/A'} <br />
+                        </>
+                        ) : (
+                          <span>No user data available</span>
+                        )}
                       </div>
                     }
                   />

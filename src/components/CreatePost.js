@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { Layout, Card, ConfigProvider, Input, Row, Col, Button, Form, message, theme, InputNumber } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { FileAddOutlined } from '@ant-design/icons';
+import { useRecoilState } from 'recoil';
+import { isFormValidState, isSubmittingState } from './state';
 
 const { Header, Content } = Layout;
 
 const CreatePost = () => {
     const [form] = Form.useForm();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isFormValid, setIsFormValid] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useRecoilState(isSubmittingState);
+    const [isFormValid, setIsFormValid] = useRecoilState(isFormValidState);
     const navigate = useNavigate();
 
     const handleSave = async (values) => {

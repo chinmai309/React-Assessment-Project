@@ -54,7 +54,8 @@ const Home = () => {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <h1 style={{textAlign: 'center'}}>Welcome to the React Application!</h1>
+        <h1 style={{textAlign: 'center', fontFamily: 'cursive'}}>Welcome to Your Daily Dose of Blog Content!</h1>
+        <h3 style={{textAlign: 'center', fontFamily: 'cursive', fontStyle: 'italic', color:'#0d374f'}}>"Discover Your Next Favorite Post"</h3>
         <ConfigProvider
           button={{
             className: styles.linearGradientButton,

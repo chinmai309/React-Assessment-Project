@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Card, List, Spin } from 'antd';
+import { useRecoilState } from 'recoil';
+import { loadingState, postState } from './state';
 
 const { Header, Content } = Layout;
 
 const PostsList = () => {
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [posts, setPosts] = useRecoilState(postState);
+    const [loading, setLoading] = useRecoilState(loadingState);
 
     useEffect(() => {
         // Fetch posts from local storage

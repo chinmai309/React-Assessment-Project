@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Card, Descriptions, Row, Typography, Col } from 'antd';
 import { useParams } from 'react-router-dom';
 import {UserOutlined} from '@ant-design/icons';
+import { useRecoilState } from 'recoil';
+import { userState } from './state';
 
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
@@ -9,7 +11,7 @@ const { Meta } = Card;
 
 const UsersDetail = () => {
   const { id } = useParams();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useRecoilState(userState);
 
   useEffect(() => {
     const userDetails = async () => {
@@ -84,7 +86,13 @@ const UsersDetail = () => {
                         <Typography.Text><strong>Phone: </strong>{user.phone}</Typography.Text><br/>
                         <Typography.Text><strong>Username: </strong>{user.username}</Typography.Text><br/>
                         <Typography.Text><strong>Email: </strong>{user.email}</Typography.Text><br/>
+                        {user.address ? (
+                          <>
                         <Typography.Text><strong>Address: </strong>{user.address.street}, {user.address.suite}, {user.address.city} - {user.address.zipcode}</Typography.Text><br/>
+                        </>
+                        ):(
+                          <span>No data available</span>
+                        )}
                         <Typography.Text><strong>Phone: </strong>{user.phone}</Typography.Text><br/>
                         <Typography.Text><strong>Website: </strong>{user.website}</Typography.Text><br/>
                         <Typography.Text><strong>Company Name: </strong>{user.company.name}</Typography.Text><br/>

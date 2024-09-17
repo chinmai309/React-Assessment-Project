@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { DashboardOutlined, RightCircleFilled, FormOutlined, CommentOutlined, TeamOutlined, ProductOutlined, CameraOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Layout, Menu, Card, Pagination, Row, Col, Typography, theme } from 'antd';
-// import { ProductOutlined } from '@ant-design/icons';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { albumsState, usersState, currentPageState, totalAlbumsState, collapsedState, albumsWithDetailsSelector } from './state';
 
 const { Header, Content, Sider } = Layout;
 const { Meta } = Card;
 const { Title } = Typography;
 
 const Albums = () => {
-  const [albums, setAlbums] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [collapsed, setCollapsed] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalAlbums, setTotalAlbums] = useState(0);
+  // Use Recoil atoms instead of useState
+  const albums = useRecoilValue(albumsWithDetailsSelector);
+  const [collapsed, setCollapsed] = useRecoilState(collapsedState);
+  const [currentPage, setCurrentPage] = useRecoilState(currentPageState);
+  const totalAlbums = useRecoilValue(totalAlbumsState);
 
   const albumsPerPage = 12; // Display 12 albums per page
   const albumsPerRow = 4; // Number of albums per row
@@ -21,48 +22,6 @@ const Albums = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-
-  useEffect(() => {
-    const fetchAlbumsUsers = async () => {
-      try {
-        // Fetch albums
-        const albumsResponse = await fetch(`https://jsonplaceholder.typicode.com/albums?_page=${currentPage}&_limit=${albumsPerPage}`);
-        const albumsData = await albumsResponse.json();
-        
-        // Fetch users
-        const usersResponse = await fetch('https://jsonplaceholder.typicode.com/users');
-        const usersData = await usersResponse.json();
-
-        // Map users to a dictionary for quick lookup
-        const usersMap = usersData.reduce((acc, user) => {
-          acc[user.id] = user;
-          return acc;
-        }, {});
-
-        // Fetch photos
-        const photosResponse = await fetch('https://jsonplaceholder.typicode.com/photos');
-        const photosData = await photosResponse.json();
-        
-        // Link albums to photos and users
-        const albumsWithPhotosAndUsers = albumsData.map(album => ({
-          ...album,
-          photo: photosData.find(photo => photo.albumId === album.id), // Match photo with albumId
-          user: usersMap[album.userId] // Link album with user
-        }));
-
-        setAlbums(albumsWithPhotosAndUsers);
-        
-        // Fetch total number of albums
-        const totalResponse = await fetch('https://jsonplaceholder.typicode.com/albums');
-        const totalData = await totalResponse.json();
-        setTotalAlbums(totalData.length);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchAlbumsUsers();
-  }, [currentPage]);
 
   const onPageChange = (page) => {
     setCurrentPage(page);
@@ -151,22 +110,24 @@ const Albums = () => {
                   }}
                 >
                   <Meta
-                    // title={album.title}
                     description={
                       <div style={{
                         color: '#3d3b45',
-                        // textAlign: 'justify',
                         display: '-webkit-box',
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        // WebkitLineClamp: 4, // Limit to 4 lines
-                        height: 'auto' // Adjust height to fit 4 lines approximately
                       }}>
                         <div style={{fontSize: 18, fontWeight: 'bold'}}>{album.title} </div> <br />
-                        User: {album.user.name} <br />
-                        Email: {album.user.email} <br />
-                        Phone: {album.user.phone} <br />
+                        {album.user ? (
+                          <>
+                            User: {album.user.name} <br />
+                            Email: {album.user.email} <br />
+                            Phone: {album.user.phone} <br />
+                          </>
+                        ) : (
+                          <span>No user data available</span>
+                        )}
                       </div>
                     }
                   />

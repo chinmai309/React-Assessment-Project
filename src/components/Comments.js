@@ -1,28 +1,16 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import { Table, Layout, ConfigProvider, Menu } from 'antd';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useNavigate, Link } from 'react-router-dom';
-import { commentsState } from './state'; // Import from state file
+import { collapsedState, commentsSelector, commentsState } from './state'; // Import from state file
 import { DashboardOutlined, RightCircleFilled, FormOutlined, CommentOutlined, UserOutlined, ProductOutlined, CameraOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
 const { Header, Content, Sider } = Layout;
 
 const Comments = () => {
-  const setComments = useSetRecoilState(commentsState);
-  const [collapsed, setCollapsed] = useState(false);
+  const comments = useRecoilValue(commentsSelector);
+  const [collapsed, setCollapsed] = useRecoilState(collapsedState);
   const navigate = useNavigate();
-
-  React.useEffect(() => {
-    // Fetch comments using Fetch API
-    fetch('https://jsonplaceholder.typicode.com/comments')
-      .then(response => response.json())
-      .then(data => {
-        setComments(data);
-      })
-      .catch(error => console.error('Error fetching comments:', error));
-  }, [setComments]);
-
-  const comments = useRecoilValue(commentsState);
 
   const columns = [
     {

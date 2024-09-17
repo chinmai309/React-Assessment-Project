@@ -15,17 +15,19 @@ import Users from './components/Users';
 import UsersDetail from './components/UsersDetail';
 import CreatePost from './components/CreatePost';
 import DeletePostsButton from './components/DeletePostsButton';
+import { Suspense } from 'react';
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
+      <Suspense fallback={<div>Loading...</div>}>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/dashboard" element={<ProtectedRoute element={Dashboard} />} />
-        <Route path="/" element={<Navigate to="/" replace />} />
         <Route path="/posts" element={<ProtectedRoute element={Posts}/>} />        
         <Route path="/posts/create" element={<ProtectedRoute element={CreatePost}/>} />
         <Route path="/posts/:id" element={<ProtectedRoute element={PostDetail}/>} />
@@ -38,6 +40,7 @@ function App() {
         {/* <Route path="/delete" element={<DeletePostsButton />} /> */}
         
       </Routes>
+      </Suspense>
     </BrowserRouter>
     </div>
   );

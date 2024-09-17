@@ -3,18 +3,20 @@ import { Layout, Menu, Card, Pagination, Row, Col, Button, theme, ConfigProvider
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FormOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { DashboardOutlined, RightCircleFilled, CommentOutlined, TeamOutlined, ProductOutlined, CameraOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { albumsState, collapsedState, currentPageState, fetchAlbumsSelector, fetchPhotosSelector, filteredAlbumsSelector, filteredPhotosSelector, photosState, postsState, totalPostsState } from './state';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 const { Header, Content, Sider } = Layout;
 const { Meta } = Card;
 const { Title } = Typography;
 
 const Posts = () => {
-  const [posts, setPosts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPosts, setTotalPosts] = useState(0);
-  const [photos, setPhotos] = useState([]);
-  const [albums, setAlbums] = useState([]);
-  const [collapsed, setCollapsed] = useState(false);
+  const [posts, setPosts] = useRecoilState(postsState);
+  const [totalPosts, setTotalPosts] = useRecoilState(totalPostsState);
+  const albums = useRecoilValue(fetchAlbumsSelector);
+  const photos = useRecoilValue(fetchPhotosSelector);
+  const [currentPage, setCurrentPage] = useRecoilState(currentPageState);
+  const [collapsed, setCollapsed] = useRecoilState(collapsedState);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,15 +46,6 @@ const Posts = () => {
         ];
 
         setPosts(combinedPosts);
-
-        // Fetch photos and albums
-        const photosResponse = await fetch('https://jsonplaceholder.typicode.com/photos');
-        const photosData = await photosResponse.json();
-        setPhotos(photosData);
-
-        const albumsResponse = await fetch('https://jsonplaceholder.typicode.com/albums');
-        const albumsData = await albumsResponse.json();
-        setAlbums(albumsData);
 
         // Fetch total number of posts from the API
         const totalResponse = await fetch('https://jsonplaceholder.typicode.com/posts');
@@ -150,6 +143,8 @@ const Posts = () => {
           padding: '0 48px',
         }}
       >
+      
+
         <div
           style={{
             padding: 24,
