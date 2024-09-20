@@ -1,8 +1,9 @@
 import React from 'react';
-import { Form, Input, Button, message, Col, Row, Card, ConfigProvider } from 'antd';
+import { Form, Button, message, Col, Row} from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { usersState, loggedInUserState } from './state'; // Import Recoil state atoms
+import FormCard from '../assets/FormCard';
 
 const Login = () => {
   const [form] = Form.useForm();
@@ -21,54 +22,42 @@ const Login = () => {
       message.error('Invalid email or password!');
     }
   };
+  const fields = [
+    {
+      name: 'email',
+      label: 'Email',
+      type: 'email',
+      rules: [{ required: true, type: 'email', message: 'Please enter a valid email!' }],
+    },
+    {
+      name: 'password',
+      label: 'Password',
+      type: 'password',
+      rules: [{ required: true, min: 6, message: 'Password must be at least 6 characters long!' }],
+    },
+  ];
+
+  const buttons = (
+    <Form.Item>
+      <Button type="primary" htmlType="submit">
+        Login
+      </Button>
+      <p>
+        Don't have an account? <br />
+        <Link to="/signup">Register</Link> here.
+      </p>
+    </Form.Item>
+  );
+
 
   return (
     <Row
-      className="login-container"
       align="middle"
       justify="center"
       style={{ backgroundColor: '#f0f0f0', minHeight: '100vh', textAlign: 'center' }}
     >
       <Col>
-        <ConfigProvider
-          theme={{
-            components: {
-              Card: {
-                headerFontSize: 20,
-              },
-            },
-          }}
-        >
-          <Card title="SIGN IN" hoverable={true} style={{ width: 400, borderWidth: 2, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
-            <div className="form-container">
-              <Form form={form} onFinish={handleSubmit} layout="vertical">
-                <Form.Item
-                  name="email"
-                  label="Email"
-                  rules={[{ required: true, type: 'email', message: 'Please enter a valid email!' }]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="password"
-                  label="Password"
-                  rules={[{ required: true, min: 6, message: 'Password must be at least 6 characters long!' }]}
-                >
-                  <Input.Password />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Login
-                  </Button>
-                </Form.Item>
-              </Form>
-              <p>
-                Don't have an account? <br />
-                <Link to="/signup">Register</Link> here.
-              </p>
-            </div>
-          </Card>
-        </ConfigProvider>
+        <FormCard title="SIGN IN" form={form} onFinish={handleSubmit} fields={fields} buttons={buttons} />
       </Col>
     </Row>
   );

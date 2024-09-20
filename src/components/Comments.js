@@ -1,11 +1,13 @@
-import React, {useEffect} from 'react';
-import { Table, Layout, ConfigProvider, Menu } from 'antd';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { useNavigate, Link } from 'react-router-dom';
-import { collapsedState, commentsSelector, commentsState } from './state'; // Import from state file
-import { DashboardOutlined, RightCircleFilled, FormOutlined, CommentOutlined, UserOutlined, ProductOutlined, CameraOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import React from 'react';
+import { Table, Layout, ConfigProvider } from 'antd';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { useNavigate } from 'react-router-dom';
+import { collapsedState, commentsSelector } from './state'; // Import from state file
+import { CommentOutlined } from '@ant-design/icons';
+import CustomHeader from '../assets/CustomHeader';
+import CustomSider from '../assets/CustomSider';
 
-const { Header, Content, Sider } = Layout;
+const { Content } = Layout;
 
 const Comments = () => {
   const comments = useRecoilValue(commentsSelector);
@@ -50,62 +52,9 @@ const Comments = () => {
 
   return (
     <Layout style={{ minHeight: '100vh'}}>
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-        style={{ position: 'fixed', left: 0, top: 0, height: '100%', zIndex: 1 }}
-      >
-        <div className="demo-logo-vertical" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}
-          style={{fontSize: 16}}
-          items={[
-            {
-              key: '1',
-              icon: <DashboardOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/dashboard">Dashboard</Link>,
-            },
-            {
-              key: '2',
-              icon: <FormOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/posts">Posts</Link>,
-            },
-            {
-              key: '3',
-              icon: <ProductOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/albums">Albums</Link>,
-            },
-            {
-              key: '4',
-              icon: <CommentOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/comments">Comments</Link>,
-            },
-            {
-              key: '5',
-              icon: <UserOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/users">Users</Link>,
-            },
-          ]}
-        />
-      </Sider>
+      <CustomSider collapsed={collapsed} onCollapse={setCollapsed} defaultSelectedKey="4" />
       <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
-      <Header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          background: '#001529'
-        }}
-      >
-        <CommentOutlined style={{ color: 'whitesmoke', fontSize: 30 }} />
-        <span style={{ color: 'whitesmoke', fontSize: 30, marginLeft: 10, fontFamily: 'cursive' }}>
-          Comments
-        </span>
-      </Header>
-
+      <CustomHeader title="Comments" icon={<CommentOutlined />} titleColor="whitesmoke" background="#001529"/>
       <Content
         style={{
           padding: '40px 48px',
@@ -114,20 +63,20 @@ const Comments = () => {
       >
         <div style={tableStyle}>
           <ConfigProvider
-          theme={{
-            components: {
-              Table: {
-                borderColor: 'black',
-                headerBg: '#4c759c', 
-                headerColor: 'azure',
-                rowHoverBg: '#c5dbf0',
-                headerSortHoverBg: '#4c759c',
-                cellFontSize: 16,
+            theme={{
+              components: {
+                Table: {
+                  borderColor: 'black',
+                  headerBg: '#4c759c', 
+                  headerColor: 'azure',
+                  rowHoverBg: '#c5dbf0',
+                  headerSortHoverBg: '#4c759c',
+                  cellFontSize: 16,
+                }
+              },
+              token: {
+                fontSize: 15,
               }
-            },
-            token: {
-              fontSize: 15,
-            }
           }}>
           <Table
             dataSource={comments}

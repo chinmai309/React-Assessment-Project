@@ -1,12 +1,14 @@
-import React, { useEffect, useState, Suspense, startTransition } from 'react';
-import { DashboardOutlined,TeamOutlined, RightCircleFilled, FormOutlined, CommentOutlined, UserOutlined, ProductOutlined, CameraOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Layout, Menu, Card, Col, Row, Button, Typography } from 'antd';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useEffect, useState, startTransition } from 'react';
+import { DashboardOutlined, RightCircleFilled, FormOutlined, UserOutlined, ProductOutlined, CameraOutlined } from '@ant-design/icons';
+import { Layout, Col, Row, Button, Typography } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { postsState, userState, albumsState, photosState, collapsedState, displayPostsState, latestPostsSelector, filteredAlbumsSelector, filteredPhotosSelector, userSelector } from './state';
+import { postsState, collapsedState, filteredAlbumsSelector, filteredPhotosSelector, loggedInUserState } from './state';
 import { createStyles } from 'antd-style';
+import CustomSider from '../assets/CustomSider';
+import DashboardCard from '../assets/DashboardCard';
 
-const { Header, Content, Sider } = Layout;
+const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const useStyle = createStyles(({ prefixCls, css }) => ({
@@ -36,7 +38,7 @@ const Dashboard = () => {
   const [posts, setPosts] = useRecoilState(postsState);
   const albums = useRecoilValue(filteredAlbumsSelector);
   const photos = useRecoilValue(filteredPhotosSelector);
-  const user = useRecoilValue(userSelector);
+  const [user, setUser] = useRecoilState(loggedInUserState); 
   const [collapsed, setCollapsed] = useRecoilState(collapsedState);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -70,11 +72,14 @@ const Dashboard = () => {
         );
 
         // Sort the posts: place post with ID 1 last, and keep the rest in the same order
-        const sortedPosts = uniquePosts.sort((a, b) => {
-          if (a.id === 1) return 1;
-          if (b.id === 1) return 1;
-          return 0;
-        });
+        // const sortedPosts = uniquePosts.sort((a, b) => {
+        //   if (a.id === 1) return 1;
+        //   if (b.id === 1) return 1;
+        //   return 0;
+        // });
+
+        // Sort the posts in descending order by `id`
+        const sortedPosts = uniquePosts.sort((a, b) => b.id - a.id);
 
         // Display only the first 4 posts
         setPosts(sortedPosts.slice(0, 4));
@@ -97,8 +102,10 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('loggedInUser');
+    setUser(null); // Clear the user state
     navigate('/login', { replace: true });
-  };
+};
+
 
   const handleClickPosts = () => {
     startTransition(() => {
@@ -118,57 +125,17 @@ const Dashboard = () => {
     });
   };
 
-  const truncateText = (text, lines = 3) => {
-    const words = text.split(' ');
-    const truncated = words.slice(0, lines * 10).join(' ') + (words.length > lines * 10 ? '...' : '');
-    return truncated;
-  };
 
   
   return (
     <Layout style={{ minHeight: '100vh'}}>
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-        style={{ position: 'fixed', left: 0, top: 0, height: '100%', zIndex: 1 }}
-      >
-        <div className="demo-logo-vertical" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}
-          style={{fontSize: 16}}
-          items={[
-            {
-              key: '1',
-              icon: <DashboardOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/dashboard">Dashboard</Link>,
-            },
-            {
-              key: '2',
-              icon: <FormOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/posts">Posts</Link>,
-            },
-            {
-              key: '3',
-              icon: <ProductOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/albums">Albums</Link>,
-            },
-            {
-              key: '4',
-              icon: <CommentOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/comments">Comments</Link>,
-            },
-            {
-              key: '5',
-              icon: <TeamOutlined style={{fontSize: 18}}/>,
-              label: <Link to="/users">Users</Link>,
-            },
-          ]}
-        />
-      </Sider>
+      <CustomSider collapsed={collapsed} onCollapse={setCollapsed} defaultSelectedKey="1" />
       <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
         <Header
           style={{
-            padding: 0,
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
             background: '#fff',
             minHeight: 100,
             display: 'flex',
@@ -196,27 +163,19 @@ const Dashboard = () => {
             </div>
           )}
         </Header>
+        
         <Content style={{ margin: '14px 16px', minHeight: 360, borderRadius: '8px', fontFamily: 'cursive' }}>
           <h1 style={{ color: '#0d374f' }}><FormOutlined /> Posts</h1>
           <div style={{ minHeight: 260, borderRadius: '8px' }}>
             <Row gutter={16}>
               {posts.map((post) => (
                 <Col span={6} key={post.id}>
-                  <Card
-                    title={post.title}
-                    bordered={false}
-                    style={{ borderWidth: 2, borderColor: 'grey', backgroundColor: '#c5dbf0', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}
-                  >
-                    <div style={{
-                      display: '-webkit-box',
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      WebkitLineClamp: 3,
-                    }}>
-                      {truncateText(post.body)}
-                    </div>
-                  </Card>
+                  <DashboardCard 
+                      title={post.title}
+                      content={post.body}
+                      onClick={() => navigate(`/posts/${post.id}`)}
+                      style={{ backgroundColor: '#c5dbf0' }}
+                  />
                 </Col>
               ))}
               <Col span={6} />
@@ -239,21 +198,11 @@ const Dashboard = () => {
                 <Row gutter={16}>
                   {albums.map((album, index) => (
                     <Col span={12} key={album.id + index} style={{ paddingLeft: '5px' }}>
-                      <Card
-                        title={`Album Id: ${album.id}`}
-                        bordered={false}
-                        style={{ height: 213, borderWidth: 2, backgroundColor: '#edd3df', color: 'black', borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', marginBottom: 10 }}
-                      >
-                        <div style={{
-                          display: '-webkit-box',
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          WebkitLineClamp: 3,
-                        }}>
-                          {truncateText(album.title)}
-                        </div>
-                      </Card>
+                      <DashboardCard 
+                          title={`Album Id: ${album.id}`}
+                          content={album.title}
+                          style={{ height: 215, backgroundColor: '#edd3df', color: 'black' }}
+                      />
                     </Col>
                   ))}
                   <Col span={12} />
@@ -270,21 +219,11 @@ const Dashboard = () => {
                 <Row gutter={12}>
                   {photos.map((photo, index) => (
                     <Col span={12} key={photo.id + index}>
-                      <Card
-                        cover={<img alt={photo.title} src={photo.thumbnailUrl} style={{ height: 120 }} />}
-                        bordered={false}
-                        style={{ borderWidth: 2, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', marginBottom: 10 }}
-                      >
-                        <div style={{
-                          display: '-webkit-box',
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          WebkitLineClamp: 3,
-                        }}>
-                          {truncateText(photo.title)}
-                        </div>
-                      </Card>
+                      <DashboardCard 
+                          cover={<img alt={photo.title} src={photo.url} style={{ height: 120 }} />}
+                          content={photo.title}
+                          style={{ height: 215 }}
+                      />
                     </Col>
                   ))}
                   <Col span={12} />

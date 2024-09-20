@@ -15,12 +15,14 @@ import Users from './components/Users';
 import UsersDetail from './components/UsersDetail';
 import CreatePost from './components/CreatePost';
 import DeletePostsButton from './components/DeletePostsButton';
+import ScrollToTop from './assets/ScrollToTop';
 import { Suspense } from 'react';
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
+      <ScrollToTop />
       <Suspense fallback={<div>Loading...</div>}>
       <Routes>
         <Route path="/" element={<Home />} />

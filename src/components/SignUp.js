@@ -1,8 +1,9 @@
 import React from 'react';
-import { Form, Input, Button, message, Col, Row, Card, ConfigProvider } from 'antd';
+import { Form, Button, message, Col, Row } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { usersState } from './state'; // Import Recoil state atom
+import FormCard from '../assets/FormCard';
 
 const SignUp = () => {
   const [form] = Form.useForm();
@@ -14,7 +15,7 @@ const SignUp = () => {
     if (users.some(user => user.email === email)) {
       message.error('User with this email already exists!');
       return;
-    }
+    } 
     const newUser = { email, name, password };
     const updatedUsers = [...users, newUser];
     setUsers(updatedUsers);
@@ -22,61 +23,47 @@ const SignUp = () => {
     message.success('Registration successful!');
     navigate('/login');
   };
+  const fields = [
+    {
+      name: 'email',
+      label: 'Email',
+      type: 'email',
+      rules: [{ required: true, type: 'email', message: 'Please enter a valid email!' }],
+    },
+    {
+      name: 'name',
+      label: 'Name',
+      type: 'text',
+      rules: [{ required: true, message: 'Please enter your name!' }],
+    },
+    {
+      name: 'password',
+      label: 'Password',
+      type: 'password',
+      rules: [{ required: true, min: 6, message: 'Password must be at least 6 characters long!' }],
+    },
+  ];
+
+  const buttons = (
+    <Form.Item>
+      <Button type="primary" htmlType="submit">
+        Sign Up
+      </Button>
+      <p>
+        Already Registered? <br />
+        Then you can <Link to="/login">Log In</Link> directly.
+      </p>
+    </Form.Item>
+  );
 
   return (
     <Row
-      className="signup-container"
       align="middle"
       justify="center"
       style={{ backgroundColor: '#f0f0f0', minHeight: '100vh', textAlign: 'center' }}
     >
       <Col>
-        <ConfigProvider
-          theme={{
-            components: {
-              Card: {
-                headerFontSize: 20,
-              },
-            },
-          }}
-        >
-          <Card title="SIGN UP" hoverable={true} style={{ width: 400, borderWidth: 2, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
-            <div className="form-container">
-              <Form form={form} onFinish={handleSubmit} layout="vertical">
-                <Form.Item
-                  name="email"
-                  label="Email"
-                  rules={[{ required: true, type: 'email', message: 'Please enter a valid email!' }]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="name"
-                  label="Name"
-                  rules={[{ required: true, message: 'Please enter your name!' }]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="password"
-                  label="Password"
-                  rules={[{ required: true, min: 6, message: 'Password must be at least 6 characters long!' }]}
-                >
-                  <Input.Password />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Sign Up
-                  </Button>
-                </Form.Item>
-              </Form>
-              <p>
-                Already Registered? <br />
-                Then you can <Link to="/login">Log In</Link> directly.
-              </p>
-            </div>
-          </Card>
-        </ConfigProvider>
+        <FormCard title="SIGN UP" form={form} onFinish={handleSubmit} fields={fields} buttons={buttons} />
       </Col>
     </Row>
   );

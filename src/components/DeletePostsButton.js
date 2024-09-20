@@ -9,7 +9,7 @@ const DeletePostsButton = () => {
       localStorage.setItem('posts', JSON.stringify(updatedPosts));
     };
 
-    deletePostsByTitle(['1726206849085', '1726208139792', '1726211830920', '1726212955151']);
+    deletePostsByTitle(['post2','bbb','aaa']);
     alert('Posts deleted!');
   };
 

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Layout, Card, Descriptions, List, Typography } from 'antd';
 import { useParams } from 'react-router-dom';
 import { FormOutlined, UserOutlined, CommentOutlined } from '@ant-design/icons';
 import { commentsState, photoState, postState, userState } from './state';
 import { useRecoilState } from 'recoil';
+import CustomHeader from '../assets/CustomHeader';
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Title } = Typography;
 
 const PostsDetail = () => {
@@ -20,7 +21,7 @@ const PostsDetail = () => {
       try {
         // Retrieve posts from local storage
         const storedPosts = JSON.parse(localStorage.getItem('posts')) || [];
-        const localPost = storedPosts.find(post => post.id === id);
+        const localPost = storedPosts.find(post => post.id === Number(id));
 
         let postData;
         if (localPost) {
@@ -58,23 +59,7 @@ const PostsDetail = () => {
 
   return (
     <Layout>
-      <Header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          background: '#001529'
-        }}
-      >
-        <FormOutlined style={{ color: 'whitesmoke', fontSize: 30 }} />
-        <span style={{ color: 'whitesmoke', fontSize: 30, marginLeft: 10, fontFamily: 'cursive' }}>
-          Post Details
-        </span>
-      </Header>
-
+      <CustomHeader title="Post Details" icon={<FormOutlined />} titleColor="whitesmoke" background="#001529"/>
       <Content
         style={{
           padding: '0 48px',
@@ -89,38 +74,39 @@ const PostsDetail = () => {
         >
           {post && (
             <Card
-              title={post.title}
-              // cover={<img alt={post.title} src={photo} style={{ height: 250 }} />}
+              title={<span style={{ fontSize: 18 }}>{post.title}</span>}
               style={{ marginBottom: 20, borderWidth: 1, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
                 borderRadius: '8px', }}
             >
-              <p>{post.body}</p>
+              <p style={{ fontSize: 16, marginTop: -4 }}>{post.body}</p>
             </Card>
           )}
           <Title level={3} style={{color: '#001529', fontFamily: 'cursive'}}><UserOutlined style={{fontSize: 30}}/> User Info</Title>
-          <Card style={{borderWidth: 1, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-                      borderRadius: '8px',}}>
-            <Descriptions style={{ marginTop: 10, fontSize: 20 }}>
+          <Card style={{borderWidth: 1, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '8px'}}>
+            <Descriptions style={{ marginTop: 0 }}>
               {user && (
                 <>
-                  <Descriptions.Item label="Name">{user.name}</Descriptions.Item>
-                  <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
+                   <Descriptions.Item label={<span style={{ color: '#000000e0', fontWeight: 'bold', fontSize: 16 }}>Name</span>}>
+                    <span style={{ fontSize: 16 }}>{user.name}</span> 
+                  </Descriptions.Item>
+                  <Descriptions.Item label={<span style={{ color: '#000000e0', fontWeight: 'bold', fontSize: 16 }}>Email</span>}>
+                    <span style={{ fontSize: 16 }}>{user.email}</span> 
+                  </Descriptions.Item>
                 </>
               )}
             </Descriptions>
           </Card>
-
           <Title level={3} style={{color: '#001529', fontFamily: 'cursive'}}><CommentOutlined style={{fontSize: 30}}/> Comments</Title>
           <List
             dataSource={comments}
             renderItem={comment => (
               <List.Item key={comment.id}>
                 <Card
-                  title={comment.name}
+                  title={<span style={{ fontSize: 18 }}>{comment.name}</span>}
                   style={{ width: '100%' }}
                 >
-                  <p>{comment.body}</p>
-                  <p><strong>Email:</strong> {comment.email}</p>
+                  <p style={{ fontSize: 16, marginTop: -4 }}>{comment.body}</p>
+                  <p style={{ fontSize: 16 }}><strong>Email:</strong> {comment.email}</p>
                 </Card>
               </List.Item>
             )}
