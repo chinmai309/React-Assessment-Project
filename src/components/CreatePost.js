@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Layout, Row, Col, Button, Form, message, theme } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { FileAddOutlined } from '@ant-design/icons';
@@ -6,10 +6,13 @@ import { useRecoilState } from 'recoil';
 import { isFormValidState, isSubmittingState } from './state';
 import CustomHeader from '../assets/CustomHeader';
 import FormCard from '../assets/FormCard';
+import { ThemeContext } from './ThemeContext';
 
 const { Content } = Layout;
 
 const CreatePost = () => {
+    const { backgroundImage } = useContext(ThemeContext); // Use background image from ThemeContext
+
     const [form] = Form.useForm();
     const [isSubmitting, setIsSubmitting] = useRecoilState(isSubmittingState);
     const [isFormValid, setIsFormValid] = useRecoilState(isFormValidState);
@@ -98,13 +101,36 @@ const CreatePost = () => {
 
     return (
         <Layout>
-            <CustomHeader title="Create Post" icon={<FileAddOutlined />} titleColor="whitesmoke" background="#001529" />
-            <Content style={{ padding: '0 48px', backgroundColor: '#aab4bd' }}>
-                <div style={{ padding: 26, borderRadius: borderRadiusLG, backgroundColor: '#aab4bd' }}>
+            <CustomHeader title="Create Post" icon={<FileAddOutlined />} titleColor="whitesmoke" />
+            <Content style={{ padding: '0 48px', backgroundColor: '#aab4bd', 
+            minHeight:'91vh',          
+            backgroundImage: `url(${backgroundImage})`, // Apply background image to Content as well
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            position: 'relative',
+            backdropFilter: 'blur(10px)',
+            backgroundRepeat: 'no-repeat',
+            }}>
+                <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: `url(${backgroundImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'blur(5px)', // Apply the blur here
+      zIndex:-1,
+    }}
+  />
+                <div style={{ padding: 26, borderRadius: borderRadiusLG }}>
                     <Row
                         align="middle"
                         justify="center"
-                        style={{ backgroundColor: '#aab4bd', minHeight: '82vh', textAlign: 'center' }}
+                        style={{ minHeight: '82vh', textAlign: 'center' }}
                     >
                         <Col>
                             <FormCard 

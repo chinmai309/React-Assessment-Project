@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+
+.login-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  z-index: 1;
+  border: none;
+}
+
+/* Background blur */
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4); /* Dark overlay for better text contrast */
+  backdrop-filter: blur(8px); /* Blur the background */
+  z-index: 1;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.logo-small {
+  height: 50px;
+  margin-right: -10px;
+}
+
+.logo-text {
+  font-size: 24px;
+  color: white;
+  font-family: 'Righteous', sans-serif;
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, startTransition } from 'react';
+import React, { useEffect, useState, startTransition, useContext } from 'react';
 import { DashboardOutlined, RightCircleFilled, FormOutlined, UserOutlined, ProductOutlined, CameraOutlined } from '@ant-design/icons';
 import { Layout, Col, Row, Button, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,8 @@ import { postsState, collapsedState, filteredAlbumsSelector, filteredPhotosSelec
 import { createStyles } from 'antd-style';
 import CustomSider from '../assets/CustomSider';
 import DashboardCard from '../assets/DashboardCard';
+import ThemeToggle from './ThemeToggle';
+import { ThemeContext } from './ThemeContext';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -35,6 +37,16 @@ const useStyle = createStyles(({ prefixCls, css }) => ({
 }));
 
 const Dashboard = () => {
+
+  const {
+    backgroundImage,
+    headerBgColor,
+    headerFontColor,
+    postsHeadingColor,
+    albumsHeadingColor,
+    photosHeadingColor,
+  } = useContext(ThemeContext); // Use background image and heading colors from context
+
   const [posts, setPosts] = useRecoilState(postsState);
   const albums = useRecoilValue(filteredAlbumsSelector);
   const photos = useRecoilValue(filteredPhotosSelector);
@@ -125,27 +137,85 @@ const Dashboard = () => {
     });
   };
 
+  const postGradients = [
+    'linear-gradient(135deg, #6253e1, #04befe)',
+    'linear-gradient(135deg, #d4fc79, #96e6a1)',
+    'linear-gradient(135deg, #f6d365, #fda085)',
+    'linear-gradient(135deg, #667eea, #764ba2)',
+    // 'linear-gradient(135deg, #89f7fe, #66a6ff)',
+
+];
+
+const albumGradients = [
+  'linear-gradient(135deg, #fcb69f, #ff9a9e)',
+  'linear-gradient(135deg, #ff9a9e, #fecfef)',
+    'linear-gradient(135deg, #fbc2eb, #a6c1ee)',
+    'linear-gradient(135deg, #fad0c4, #ffd1ff)',
+    // 'linear-gradient(135deg, #89f7fe, #66a6ff)',
+    // 'linear-gradient(135deg, #d4fc79, #96e6a1)',
+    // 'linear-gradient(135deg, #fcb69f, #ff9a9e)',
+    // 'linear-gradient(135deg, #ff9966, #ff5e62)',
+];
+
+const photoGradients = [
+    // 'linear-gradient(135deg, #89f7fe, #66a6ff)',
+    // 'linear-gradient(135deg, #d4fc79, #96e6a1)',
+    // 'linear-gradient(135deg, #fcb69f, #ff9a9e)',
+    // 'linear-gradient(135deg, #ff9966, #ff5e62)',
+    // 'linear-gradient(135deg, #fad0c4, #ffd1ff)',
+'linear-gradient(135deg, #778899, #ffffff)',
+// 'linear-gradient(135deg, #2f2f2f, #b0b0b0, #ffffff)',
+// 'linear-gradient(135deg, #d3d3d3, #808080, #000000)',
+// 'linear-gradient(135deg, #ffffff, #c0c0c0, #000000)',
+];
+
 
   
   return (
-    <Layout style={{ minHeight: '100vh'}}>
-      <CustomSider collapsed={collapsed} onCollapse={setCollapsed} defaultSelectedKey="1" />
-      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
+    <Layout style={{ minHeight: '100vh', backgroundColor:'#414a4c'}}>
+      <CustomSider collapsed={collapsed} onCollapse={setCollapsed} defaultSelectedKey="1"/>
+      <Layout
+  style={{
+    marginLeft: collapsed ? 80 : 200,
+    minHeight: '100vh',
+    backgroundColor: '#414a4c',
+    position: 'relative',
+    overflow: 'hidden', // Ensure content doesn't overflow past blurred background
+  }}
+>
+  {/* Pseudo-element for background image */}
+  <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: `url(${backgroundImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'blur(8px)', // Apply the blur here
+    }}
+  />
+
+
         <Header
           style={{
             position: 'sticky',
             top: 0,
             zIndex: 1,
-            background: '#fff',
+            background: headerBgColor, // Apply the dynamic header background color
             minHeight: 100,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '0px 20px',
+            color: headerFontColor
           }}
         >
-          <Title level={1} style={{ margin: 0, fontFamily: 'cursive' }}>
-            <DashboardOutlined style={{ fontSize: 35 }} /> Dashboard
+          <Title level={1} style={{ margin: 0, fontFamily: 'cursive', color:headerFontColor }}>
+            <DashboardOutlined style={{ fontSize: 35, color:headerFontColor }} /> Dashboard
           </Title>
           {user && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: -20, marginRight: 20 }}>
@@ -164,17 +234,20 @@ const Dashboard = () => {
           )}
         </Header>
         
-        <Content style={{ margin: '14px 16px', minHeight: 360, borderRadius: '8px', fontFamily: 'cursive' }}>
-          <h1 style={{ color: '#0d374f' }}><FormOutlined /> Posts</h1>
+        <Content style={{ margin: '14px 16px', minHeight: 360, borderRadius: '8px', fontFamily: 'cursive', zIndex: 0, paddingRight: '45px', paddingLeft: '40px' }}>
+          <h1 style={{ color: postsHeadingColor, fontFamily:'cursive' }}><FormOutlined /> Posts</h1>
           <div style={{ minHeight: 260, borderRadius: '8px' }}>
             <Row gutter={16}>
-              {posts.map((post) => (
+              {posts.map((post, index) => (
                 <Col span={6} key={post.id}>
                   <DashboardCard 
                       title={post.title}
                       content={post.body}
                       onClick={() => navigate(`/posts/${post.id}`)}
                       style={{ backgroundColor: '#c5dbf0' }}
+                      index={index}  // Pass the index to the card
+                      gradients={postGradients} // Pass the gradient array
+
                   />
                 </Col>
               ))}
@@ -183,14 +256,14 @@ const Dashboard = () => {
               <Col span={6} />
               <Col span={6}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px', color: '#0d4463' }}>
-                  <span style={{ marginRight: '8px' }}>View All <FormOutlined /></span>
+                  <span style={{ marginRight: '8px', color:headerFontColor }}>View All <FormOutlined /></span>
                   <Button type="primary" shape="circle" onClick={handleClickPosts} icon={<RightCircleFilled style={{ fontSize: 30 }} />} />
                 </div>
               </Col>
             </Row>
             <Row>
-              <Col span={12}><h1 style={{ color: '#4f0d2b', fontFamily: 'cursive' }}><ProductOutlined /> Albums</h1></Col>
-              <Col span={12}><h1 style={{ color: '#0d4f4c', fontFamily: 'cursive' }}><CameraOutlined /> Photos</h1></Col>
+              <Col span={12}><h1 style={{ color: albumsHeadingColor, fontFamily: 'cursive' }}><ProductOutlined /> Albums</h1></Col>
+              <Col span={12}><h1 style={{ color: photosHeadingColor, fontFamily: 'cursive' }}><CameraOutlined /> Photos</h1></Col>
             </Row>
             {/* Albums */}
             <Row gutter={16} style={{ marginTop: 4 }}>
@@ -201,14 +274,16 @@ const Dashboard = () => {
                       <DashboardCard 
                           title={`Album Id: ${album.id}`}
                           content={album.title}
-                          style={{ height: 215, backgroundColor: '#edd3df', color: 'black' }}
+                          index={index} 
+                          style={{ height: 215 }}
+                          gradients={albumGradients} // Pass the gradient array
                       />
                     </Col>
                   ))}
                   <Col span={12} />
                   <Col span={12}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px', color: '#0d4463' }}>
-                      <span style={{ marginRight: '8px' }}>View All <ProductOutlined /></span>
+                      <span style={{ marginRight: '8px', color:headerFontColor }}>View All <ProductOutlined /></span>
                       <Button type="primary" shape="circle" onClick={handleClickAlbums} icon={<RightCircleFilled style={{ fontSize: 30 }} />} />
                     </div>
                   </Col>
@@ -222,14 +297,16 @@ const Dashboard = () => {
                       <DashboardCard 
                           cover={<img alt={photo.title} src={photo.url} style={{ height: 120 }} />}
                           content={photo.title}
+                          index={index} 
                           style={{ height: 215 }}
-                      />
+                          gradients={photoGradients} // Pass the gradient array
+                          />
                     </Col>
                   ))}
                   <Col span={12} />
                   <Col span={12}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px', color: '#0d4463' }}>
-                      <span style={{ marginRight: '8px' }}>View All <CameraOutlined /></span>
+                      <span style={{ marginRight: '8px', color: headerFontColor }}>View All <CameraOutlined /></span>
                       <Button type="primary" shape="circle" onClick={handleClickPhotos} icon={<RightCircleFilled style={{ fontSize: 30 }} />} />
                     </div>
                   </Col>
@@ -239,6 +316,7 @@ const Dashboard = () => {
           </div>
         </Content>
       </Layout>
+      <ThemeToggle />
     </Layout>
 
   );

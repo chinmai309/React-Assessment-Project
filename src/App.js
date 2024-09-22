@@ -17,10 +17,26 @@ import CreatePost from './components/CreatePost';
 import DeletePostsButton from './components/DeletePostsButton';
 import ScrollToTop from './assets/ScrollToTop';
 import { Suspense } from 'react';
+import React, { useContext } from 'react';
+import { theme } from 'antd';
+import { ThemeContext, ThemeProvider } from './components/ThemeContext';
+import ThemeToggleButton from './components/ThemeToggle';
 
 function App() {
+  const { theme, backgroundImage } = useContext(ThemeContext);
+
   return (
-    <div className="App">
+    <ThemeProvider>
+    <div
+        className={`App ${theme}`}
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          minHeight: '100vh',
+        }}
+      >
+      <ThemeToggleButton />
       <BrowserRouter>
       <ScrollToTop />
       <Suspense fallback={<div>Loading...</div>}>
@@ -45,6 +61,7 @@ function App() {
       </Suspense>
     </BrowserRouter>
     </div>
+    </ThemeProvider>
   );
 }
 

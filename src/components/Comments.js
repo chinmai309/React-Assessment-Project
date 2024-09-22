@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Table, Layout, ConfigProvider } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
@@ -6,10 +6,13 @@ import { collapsedState, commentsSelector } from './state'; // Import from state
 import { CommentOutlined } from '@ant-design/icons';
 import CustomHeader from '../assets/CustomHeader';
 import CustomSider from '../assets/CustomSider';
+import { ThemeContext } from './ThemeContext';
 
 const { Content } = Layout;
 
 const Comments = () => {
+  const { backgroundImage } = useContext(ThemeContext); // Use background image from context
+
   const comments = useRecoilValue(commentsSelector);
   const [collapsed, setCollapsed] = useRecoilState(collapsedState);
   const navigate = useNavigate();
@@ -46,52 +49,73 @@ const Comments = () => {
     borderWidth: '1px',
     borderColor: 'grey',
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.5)',
-    background: 'white',
-    padding: '20px 28px',
+    background: 'linear-gradient(135deg, white, #768491)',
+    padding: '15px',
   };
 
   return (
-    <Layout style={{ minHeight: '100vh'}}>
+    <Layout style={{ minHeight: '100vh' }}>
       <CustomSider collapsed={collapsed} onCollapse={setCollapsed} defaultSelectedKey="4" />
-      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
-      <CustomHeader title="Comments" icon={<CommentOutlined />} titleColor="whitesmoke" background="#001529"/>
-      <Content
+      <Layout
         style={{
-          padding: '40px 48px',
-          backgroundColor: '#aab4bd',
+          marginLeft: collapsed ? 80 : 200,
+          backgroundImage: `url(${backgroundImage})`,  // Use dynamic backgroundImage from context
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'relative',
+          backdropFilter: 'blur(8px)',
+          backgroundRepeat: 'no-repeat',
         }}
       >
-        <div style={tableStyle}>
-          <ConfigProvider
-            theme={{
-              components: {
-                Table: {
-                  borderColor: 'black',
-                  headerBg: '#4c759c', 
-                  headerColor: 'azure',
-                  rowHoverBg: '#c5dbf0',
-                  headerSortHoverBg: '#4c759c',
-                  cellFontSize: 16,
-                }
-              },
-              token: {
-                fontSize: 15,
-              }
-          }}>
-          <Table
-            dataSource={comments}
-            columns={columns}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-            onRow={(record) => ({
-              onClick: () => {
-                navigate(`/comments/${record.postId}`);
-              },
-            })}
-          />
-          </ConfigProvider>
-        </div>
-      </Content>
+        <CustomHeader title="Comments" icon={<CommentOutlined />} titleColor="whitesmoke" />
+        <Content
+          style={{
+            padding: '40px 48px',
+            backgroundColor: '#aab4bd',
+            backgroundImage: `url(${backgroundImage})`,  // Use dynamic backgroundImage here as well
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            position: 'relative',
+            backdropFilter: 'blur(8px)',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
+          <div style={tableStyle}>
+            <ConfigProvider
+              theme={{
+                components: {
+                  Table: {
+                    borderColor: 'black',
+                    headerBg: '#768491',
+                    headerColor: 'white',
+                    rowHoverBg: '#c5dbf0',
+                    headerSortHoverBg: '#768491',
+                    cellFontSize: 16,
+                    cellBg: '#c5d5e3', // Set the background color for table cells
+                    cellColor: 'black', // Set the text color for table cells
+                    paddingContentHorizontal: 15,
+                  },
+                },
+                token: {
+                  fontSize: 15,
+                  padding: 15,
+                },
+              }}
+            >
+              <Table
+                dataSource={comments}
+                columns={columns}
+                rowKey="id"
+                pagination={{ pageSize: 10 }}
+                onRow={(record) => ({
+                  onClick: () => {
+                    navigate(`/comments/${record.postId}`);
+                  },
+                })}
+              />
+            </ConfigProvider>
+          </div>
+        </Content>
       </Layout>
     </Layout>
   );

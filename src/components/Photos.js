@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Layout, Row, Col, theme } from 'antd';
 import { CameraOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -7,10 +7,15 @@ import CustomHeader from '../assets/CustomHeader';
 import CustomSider from '../assets/CustomSider';
 import PaginationComponent from '../assets/PaginationComponent';
 import CustomCardOne from '../assets/CustomCardOne';
+import { ThemeContext } from './ThemeContext';
 
 const { Content } = Layout;
 
 const Photos = () => {
+  const {
+    backgroundImage,
+  } = useContext(ThemeContext); // Use background image and heading colors from context
+
   const photos = useRecoilValue(photosWithAlbumsSelector);
   const totalPhotos = useRecoilValue(totalPhotosSelector);
   const [collapsed, setCollapsed] = useRecoilState(collapsedState);
@@ -26,7 +31,30 @@ const Photos = () => {
   return (
     <Layout style={{ minHeight: '100vh'}}>
       <CustomSider collapsed={collapsed} onCollapse={setCollapsed} />
-      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
+      <Layout
+  style={{
+    marginLeft: collapsed ? 80 : 200,
+    minHeight: '100vh',
+    backgroundColor: '#414a4c',
+    position: 'relative',
+    overflow: 'hidden', // Ensure content doesn't overflow past blurred background
+  }}
+>
+  {/* Pseudo-element for background image */}
+  <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: `url(${backgroundImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'blur(8px)', // Apply the blur here
+    }}
+  />
       <CustomHeader title="Photos" icon={<CameraOutlined />} titleColor='#0d4f4c' />
       <Content
         style={{

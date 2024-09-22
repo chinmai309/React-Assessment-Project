@@ -45,7 +45,7 @@ export const commentsState = atom({
 // Atom for managing collapsed State
 export const collapsedState = atom({
   key: 'collapsedState',
-  default: false,
+  default: true,
 });
 
 // Atom for managing display posts State

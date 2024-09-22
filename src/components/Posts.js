@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Layout, Row, Col, Button, theme, ConfigProvider } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FormOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -8,10 +8,17 @@ import CustomHeader from '../assets/CustomHeader';
 import CustomSider from '../assets/CustomSider';
 import CustomCardOne from '../assets/CustomCardOne';
 import PaginationComponent from '../assets/PaginationComponent';
+import { ThemeContext } from './ThemeContext';
 
 const { Content } = Layout;
 
 const Posts = () => {
+  const {
+    backgroundImage,
+    postsButtonBg,
+    postsButtonText,
+  } = useContext(ThemeContext); // Use background image and heading colors from context
+
   const [posts, setPosts] = useRecoilState(postsState);
   const [totalPosts, setTotalPosts] = useRecoilState(totalPostsState);
   const albums = useRecoilValue(fetchAlbumsSelector);
@@ -94,8 +101,31 @@ const Posts = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <CustomSider collapsed={collapsed} onCollapse={setCollapsed} defaultSelectedKey="2" />
-      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
-        <CustomHeader title="Posts" icon={<FormOutlined />} titleColor='#0d374f' />
+      <Layout
+  style={{
+    marginLeft: collapsed ? 80 : 200,
+    minHeight: '100vh',
+    backgroundColor: '#414a4c',
+    position: 'relative',
+    overflow: 'hidden', // Ensure content doesn't overflow past blurred background
+  }}
+>
+  {/* Pseudo-element for background image */}
+  <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: `url(${backgroundImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'blur(8px)', // Apply the blur here
+    }}
+  />
+        <CustomHeader title="Posts" icon={<FormOutlined />}/>
         <Content
           style={{
             padding: '0 48px',
@@ -112,14 +142,18 @@ const Posts = () => {
             <Button
               type="primary"
               style={{
-                backgroundColor: '#0d374f',
+                backgroundColor: postsButtonBg,
                 position: 'absolute',
                 top: 20,
                 right: 10,
+                color:postsButtonText,
+                fontSize:18,
+                fontFamily:'cursive',
+                fontWeight: 'bold',
               }}
               onClick={() => navigate(`/posts/create`)}
             >
-              CREATE POST <PlusCircleOutlined style={{ fontSize: 15 }} />
+              CREATE POST <PlusCircleOutlined style={{ fontSize: 18 }} />
             </Button>
             
             <Row gutter={[16, 16]} style={{ marginTop: '50px', marginBottom: '30px' }}>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pagination } from 'antd';
+import './Pagination.css'
 
 const PaginationComponent = ({ pageSize, total, current, onChange }) => {
   return (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { ProductOutlined } from '@ant-design/icons';
 import { Layout, Row, Col, theme } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -7,10 +7,15 @@ import CustomHeader from '../assets/CustomHeader';
 import CustomSider from '../assets/CustomSider';
 import PaginationComponent from '../assets/PaginationComponent';
 import CustomCardOne from '../assets/CustomCardOne';
+import { ThemeContext } from './ThemeContext';
 
 const { Content } = Layout;
 
 const Albums = () => {
+  const {
+    backgroundImage,
+  } = useContext(ThemeContext); // Use background image and heading colors from context
+
   const albums = useRecoilValue(albumsWithDetailsSelector);
   const [collapsed, setCollapsed] = useRecoilState(collapsedState);
   const totalAlbums = useRecoilValue(totalAlbumsSelector);
@@ -26,8 +31,30 @@ const Albums = () => {
   return (
     <Layout style={{ minHeight: '100vh'}}>
       <CustomSider collapsed={collapsed} onCollapse={setCollapsed} defaultSelectedKey="3" />
-      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
-      <CustomHeader title="Albums" icon={<ProductOutlined />} titleColor='#4f0d2b' />
+      <Layout
+  style={{
+    marginLeft: collapsed ? 80 : 200,
+    minHeight: '100vh',
+    backgroundColor: '#414a4c',
+    position: 'relative',
+    overflow: 'hidden', // Ensure content doesn't overflow past blurred background
+  }}
+>
+  {/* Pseudo-element for background image */}
+  <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: `url(${backgroundImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'blur(8px)', // Apply the blur here
+    }}
+  />      <CustomHeader title="Albums" icon={<ProductOutlined />} titleColor='#4f0d2b' />
       <Content
         style={{
           padding: '0 48px',

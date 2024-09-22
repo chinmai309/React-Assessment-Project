@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Layout, Row, Col, Typography, theme, ConfigProvider } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -7,10 +7,15 @@ import { TeamOutlined } from '@ant-design/icons';
 import CustomHeader from '../assets/CustomHeader';
 import CustomSider from '../assets/CustomSider';
 import CustomCardOne from '../assets/CustomCardOne';
+import { ThemeContext } from './ThemeContext';
 
 const { Content } = Layout;
 
 const Users = () => {
+  const {
+    backgroundImage, cardBgColor
+  } = useContext(ThemeContext); // Use background image and heading colors from context
+
   const users = useRecoilValue(usersSelector);
   const currentPage = useRecoilValue(currentPageState);
   const [collapsed, setCollapsed] = useRecoilState(collapsedState);
@@ -28,8 +33,30 @@ const Users = () => {
   return (
     <Layout style={{ minHeight: '100vh'}}>
       <CustomSider collapsed={collapsed} onCollapse={setCollapsed} defaultSelectedKey="5" />
-      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
-      <CustomHeader title="Users" icon={<TeamOutlined />} titleColor="#001529"/>
+      <Layout
+  style={{
+    marginLeft: collapsed ? 80 : 200,
+    minHeight: '100vh',
+    backgroundColor: '#414a4c',
+    position: 'relative',
+    overflow: 'hidden', // Ensure content doesn't overflow past blurred background
+  }}
+>
+  {/* Pseudo-element for background image */}
+  <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: `url(${backgroundImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'blur(8px)', // Apply the blur here
+    }}
+  />      <CustomHeader title="Users" icon={<TeamOutlined />} titleColor="#001529"/>
       <Content
         style={{
           padding: '0 48px',
@@ -71,7 +98,7 @@ const Users = () => {
                     
                   }
                   onClick={() => navigate(`/users/${user.id}`)}
-                  style={{ cursor: 'pointer', backgroundColor: '#c5d5e3' }}
+                  style={{ cursor: 'pointer', backgroundColor: cardBgColor }}
                 />
                 </ConfigProvider>
               </Col>

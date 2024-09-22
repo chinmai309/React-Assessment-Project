@@ -1,0 +1,35 @@
+/* Change pagination buttons and text color to white */
+.ant-pagination-item a {
+    color: white !important;
+}
+
+/* Change active pagination button background and border color */
+.ant-pagination-item-active {
+    background-color: white !important;
+    border-color: white !important;
+}
+
+.ant-pagination-item a {
+    color: #000 !important; /* Active page number color (change as needed) */
+}
+
+/* Change the pagination icons (prev, next arrows) to white */
+.ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination-next .ant-pagination-item-link {
+    color: white !important;
+    border-color: white !important;
+}
+
+/* Change disabled state color of the pagination icons */
+.ant-pagination-prev.ant-pagination-disabled .ant-pagination-item-link,
+.ant-pagination-next.ant-pagination-disabled .ant-pagination-item-link {
+    color: rgba(255, 255, 255, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.ant-pagination .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+    color: white;
+}
+.ant-pagination .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+    color: white;
+}

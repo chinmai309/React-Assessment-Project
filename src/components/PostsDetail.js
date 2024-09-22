@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Layout, Card, Descriptions, List, Typography } from 'antd';
 import { useParams } from 'react-router-dom';
 import { FormOutlined, UserOutlined, CommentOutlined } from '@ant-design/icons';
 import { commentsState, photoState, postState, userState } from './state';
 import { useRecoilState } from 'recoil';
 import CustomHeader from '../assets/CustomHeader';
+import { ThemeContext } from './ThemeContext'; // Import ThemeContext
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -15,6 +16,8 @@ const PostsDetail = () => {
   const [comments, setComments] = useRecoilState(commentsState);
   const [user, setUser] = useRecoilState(userState);
   const [photo, setPhoto] = useRecoilState(photoState);
+
+  const { backgroundImage, headerFontColor } = useContext(ThemeContext); // Use background image from ThemeContext
 
   useEffect(() => {
     const fetchPostDetails = async () => {
@@ -59,44 +62,70 @@ const PostsDetail = () => {
 
   return (
     <Layout>
-      <CustomHeader title="Post Details" icon={<FormOutlined />} titleColor="whitesmoke" background="#001529"/>
+      <CustomHeader title="Post Details" icon={<FormOutlined />} titleColor="whitesmoke" />
       <Content
         style={{
           padding: '0 48px',
-          backgroundColor: '#aab4bd'
+          backgroundColor: '#aab4bd',
+          backgroundImage: `url(${backgroundImage})`, // Apply background image to Content as well
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'relative',
+          backdropFilter: 'blur(10px)',
+          backgroundRepeat: 'no-repeat',
+          minHeight: '91vh'
         }}
       >
+        <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: `url(${backgroundImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'blur(8px)', // Apply the blur here
+      zIndex:-1,
+    }}
+  />
         <div
           style={{
             padding: 24,
             minHeight: 380,
+            zIndex: 2,
           }}
         >
           {post && (
             <Card
               title={<span style={{ fontSize: 18 }}>{post.title}</span>}
-              style={{ marginBottom: 20, borderWidth: 1, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-                borderRadius: '8px', }}
+              style={{ marginBottom: 20, borderWidth: 1, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '8px' }}
             >
               <p style={{ fontSize: 16, marginTop: -4 }}>{post.body}</p>
             </Card>
           )}
-          <Title level={3} style={{color: '#001529', fontFamily: 'cursive'}}><UserOutlined style={{fontSize: 30}}/> User Info</Title>
-          <Card style={{borderWidth: 1, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '8px'}}>
+          <Title level={3} style={{ color: headerFontColor, fontFamily: 'cursive' }}>
+            <UserOutlined style={{ fontSize: 30 }} /> User Info
+          </Title>
+          <Card style={{ borderWidth: 1, borderColor: 'grey', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '8px' }}>
             <Descriptions style={{ marginTop: 0 }}>
               {user && (
                 <>
-                   <Descriptions.Item label={<span style={{ color: '#000000e0', fontWeight: 'bold', fontSize: 16 }}>Name</span>}>
-                    <span style={{ fontSize: 16 }}>{user.name}</span> 
+                  <Descriptions.Item label={<span style={{ color: '#000000e0', fontWeight: 'bold', fontSize: 16 }}>Name</span>}>
+                    <span style={{ fontSize: 16 }}>{user.name}</span>
                   </Descriptions.Item>
                   <Descriptions.Item label={<span style={{ color: '#000000e0', fontWeight: 'bold', fontSize: 16 }}>Email</span>}>
-                    <span style={{ fontSize: 16 }}>{user.email}</span> 
+                    <span style={{ fontSize: 16 }}>{user.email}</span>
                   </Descriptions.Item>
                 </>
               )}
             </Descriptions>
           </Card>
-          <Title level={3} style={{color: '#001529', fontFamily: 'cursive'}}><CommentOutlined style={{fontSize: 30}}/> Comments</Title>
+          <Title level={3} style={{ color: headerFontColor, fontFamily: 'cursive' }}>
+            <CommentOutlined style={{ fontSize: 30 }} /> Comments
+          </Title>
           <List
             dataSource={comments}
             renderItem={comment => (
